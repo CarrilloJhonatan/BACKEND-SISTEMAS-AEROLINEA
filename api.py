@@ -34,6 +34,20 @@ def obtener_usuarios():
         return jsonify(response.data)
     except Exception as e:
         return jsonify({"error": str(e)})
+    
+# Ruta para obtener un usuario por su ID
+@app.route('/api/usuarios/<int:usuario_id>', methods=['GET'])
+def obtener_usuario_por_id(usuario_id):
+    try:
+        response = supabase.table("usuarios").select("*").eq('id', usuario_id).execute()
+        if response.data:
+            # Si se encuentra el usuario, retornar sus datos
+            return jsonify(response.data[0])
+        else:
+            # Si no se encuentra el usuario, retornar un mensaje de error
+            return jsonify({"mensaje": "Usuario no encontrado"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 # Ruta para registrar un nuevo usuario
 @app.route('/api/usuarios', methods=['POST'])
@@ -59,14 +73,48 @@ def registrar_usuario():
         return jsonify({"mensaje": "Usuario registrado con éxito"})
     except Exception as e:
         return jsonify({"error": str(e)})
+    
 
-# Ruta para consultar el historial de chat (requiere autenticación)
-@app.route('/api/historial_chat', methods=['GET'])
+# Ruta para actualizar un usuario por su ID
+@app.route('/api/usuarios/<int:usuario_id>', methods=['PUT'])
 @jwt_required()
-def consultar_historial():
+def actualizar_usuario_por_id(usuario_id):
     try:
-        response = supabase.table("historial_chat").select("*").execute()
-        return jsonify(response.data)
+        # Verificar si el usuario existe
+        existe_usuario = supabase.table("usuarios").select("*").eq('id', usuario_id).execute().data
+
+        if not existe_usuario:
+            return jsonify({"mensaje": "Usuario no encontrado"})
+
+        # Obtener los datos actualizados del usuario desde la solicitud
+        datos_actualizados = request.get_json()
+
+        # Filtrar solo los campos permitidos para la actualización
+        campos_permitidos = ["nombre", "email", "contraseña"]
+        datos_actualizados = {campo: datos_actualizados[campo] for campo in campos_permitidos if campo in datos_actualizados}
+
+        # Actualizar el usuario en la base de datos
+        supabase.table("usuarios").update(datos_actualizados).eq("id", usuario_id).execute()
+
+        return jsonify({"mensaje": "Usuario actualizado con éxito"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+# Ruta para eliminar un usuario por su ID
+@app.route('/api/usuarios/<int:usuario_id>', methods=['DELETE'])
+@jwt_required()
+def eliminar_usuario_por_id(usuario_id):
+    try:
+        # Verificar si el usuario existe
+        existe_usuario = supabase.table("usuarios").select("*").eq('id', usuario_id).execute().data
+
+        if not existe_usuario:
+            return jsonify({"mensaje": "Usuario no encontrado"})
+
+        # Eliminar el usuario en la base de datos
+        supabase.table("usuarios").delete().eq("id", usuario_id).execute()
+
+        return jsonify({"mensaje": "Usuario eliminado con éxito"})
     except Exception as e:
         return jsonify({"error": str(e)})
 
@@ -91,6 +139,27 @@ def iniciar_sesion():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+# Ruta para cerrar sesión (requiere autenticación)
+@app.route('/api/cerrar_sesion', methods=['GET'])
+@jwt_required()
+def cerrar_sesion():
+    try:
+        # Cerrar sesión utilizando el servicio de autenticación de Supabase
+        response = supabase.auth.sign_out()
+        return jsonify({"mensaje": "Usuario desconectado"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+# Ruta para consultar el historial de chat (requiere autenticación)
+@app.route('/api/historial_chat', methods=['GET'])
+@jwt_required()
+def consultar_historial():
+    try:
+        response = supabase.table("historial_chat").select("*").execute()
+        return jsonify(response.data)
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
 # Ruta para procesar solicitudes del chatbot (requiere autenticación)
 @app.route('/api/chat', methods=['POST'])
 @jwt_required()
@@ -123,17 +192,6 @@ def chat():
         return jsonify({"response": res, "mensaje": "Historial de chat guardado con éxito"})
     except Exception as e:
         return jsonify({"response": res, "error": str(e)})
-
-# Ruta para cerrar sesión (requiere autenticación)
-@app.route('/api/cerrar_sesion', methods=['GET'])
-@jwt_required()
-def cerrar_sesion():
-    try:
-        # Cerrar sesión utilizando el servicio de autenticación de Supabase
-        response = supabase.auth.sign_out()
-        return jsonify({"mensaje": "Usuario desconectado"})
-    except Exception as e:
-        return jsonify({"error": str(e)})
 
 # Iniciar la aplicación si este script es ejecutado directamente
 if __name__ == "__main__":
