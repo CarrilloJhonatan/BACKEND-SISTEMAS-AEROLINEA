@@ -1,3 +1,4 @@
+import datetime
 from inspect import indentsize
 import json
 import os
@@ -129,8 +130,8 @@ def iniciar_sesion():
         # Autenticar al usuario utilizando el servicio de autenticación de Supabase
         supabase.auth.sign_in_with_password({"email": email, "password": contraseña})
 
-        # Crear un token JWT para el usuario autenticado
-        access_token = create_access_token(identity=email)
+        # Crear un token JWT para el usuario autenticado y darle tiempo de expiracion a 1 hora
+        access_token = create_access_token(identity=email, expires_delta=datetime.timedelta(seconds=3600))
 
         # Almacenar el token en la variable de sesión (opcional)
         session['access_token'] = access_token
@@ -145,7 +146,7 @@ def iniciar_sesion():
 def cerrar_sesion():
     try:
         # Cerrar sesión utilizando el servicio de autenticación de Supabase
-        response = supabase.auth.sign_out()
+        supabase.auth.sign_out()
         return jsonify({"mensaje": "Usuario desconectado"})
     except Exception as e:
         return jsonify({"error": str(e)})
@@ -159,6 +160,22 @@ def consultar_historial():
         return jsonify(response.data)
     except Exception as e:
         return jsonify({"error": str(e)})
+    
+# Ruta para consultar el historial de chat por su ID (requiere autenticación)
+@app.route('/api/historial_chat/<int:usuario_id>', methods=['GET'])
+@jwt_required()
+def consultar_historial_por_id(usuario_id):
+    try:
+        response = supabase.table("historial_chat").select("*").eq('usuario_id', usuario_id).execute()
+        if response.data:
+            # Si se encuentra el usuario, retornar sus datos
+            return jsonify(response.data)
+        else:
+            # Si no se encuentra el usuario, retornar un mensaje de error
+            return jsonify({"mensaje": "Usuario no encontrado"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
     
 # Ruta para procesar solicitudes del chatbot (requiere autenticación)
 @app.route('/api/chat', methods=['POST'])
