@@ -6,19 +6,27 @@ import secrets
 from flask import Flask, request, jsonify, session
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from supabase import create_client
-
 from chatbot import get_response, predict_class
-
+# Crear una instancia de la aplicación Flask
 app = Flask(__name__)
+
+# Configurar la clave secreta de la aplicación y la clave secreta para JWT
 app.secret_key = secrets.token_urlsafe(32)
 app.config['JWT_SECRET_KEY'] = secrets.token_urlsafe(32)
+
+# Configurar el sistema de gestión de tokens JWT
 jwt = JWTManager(app)
-intents = json.loads(open('intents.json', encoding='utf-8').read())
+
 # Configuración de las credenciales de Supabase
 SUPABASE_URL = "https://nrnbqoxuhupcxlboisyg.supabase.co"
 SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ybmJxb3h1aHVwY3hsYm9pc3lnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5NzM4MzI5MCwiZXhwIjoyMDEyOTU5MjkwfQ.YkFTxwAKzNs6gukWMOA9ug6sboUJgEVU_SWJQmtzawU" 
 supabase = create_client(SUPABASE_URL, SUPABASE_API_KEY)
 
+
+# Ruta para obtener los datos de intents.json para el chatbot
+intents = json.loads(open('intents.json', encoding='utf-8').read())
+
+# Ruta para obtener la lista de usuarios
 @app.route('/api/usuarios', methods=['GET'])
 def obtener_usuarios():
     try:
@@ -27,6 +35,7 @@ def obtener_usuarios():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+# Ruta para registrar un nuevo usuario
 @app.route('/api/usuarios', methods=['POST'])
 def registrar_usuario():
     try:
@@ -35,7 +44,10 @@ def registrar_usuario():
         email = data.get('email')
         contraseña = data.get('contraseña')
 
+        # Registrarse en el servicio de autenticación de Supabase
         response = supabase.auth.sign_up({"email": email, "password": contraseña})
+
+        # Crear un nuevo usuario y almacenarlo en la base de datos
         nuevo_usuario = {
             "nombre": nombre,
             "email": email,
@@ -48,6 +60,7 @@ def registrar_usuario():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+# Ruta para consultar el historial de chat (requiere autenticación)
 @app.route('/api/historial_chat', methods=['GET'])
 @jwt_required()
 def consultar_historial():
@@ -57,6 +70,7 @@ def consultar_historial():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+# Ruta para iniciar sesión y obtener un token JWT
 @app.route('/api/iniciar_sesion', methods=['POST'])
 def iniciar_sesion():
     try:
@@ -64,10 +78,10 @@ def iniciar_sesion():
         email = data.get('email')
         contraseña = data.get('password')
 
-        # Autenticar al usuario
+        # Autenticar al usuario utilizando el servicio de autenticación de Supabase
         supabase.auth.sign_in_with_password({"email": email, "password": contraseña})
 
-        # Crear un token JWT
+        # Crear un token JWT para el usuario autenticado
         access_token = create_access_token(identity=email)
 
         # Almacenar el token en la variable de sesión (opcional)
@@ -77,12 +91,14 @@ def iniciar_sesion():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+# Ruta para procesar solicitudes del chatbot (requiere autenticación)
 @app.route('/api/chat', methods=['POST'])
 @jwt_required()
 def chat():
     data = request.get_json()
     message = data.get('message', '')
     
+    # Utilizar el chatbot para obtener una respuesta
     ints = predict_class(message)
     res = get_response(ints, intents)
     
@@ -90,7 +106,7 @@ def chat():
         mensaje = message
         respuesta_chatbot = res
 
-        # Obtener el usuario_id utilizando el email de la sesión
+        # Obtener el ID del usuario utilizando el correo electrónico de la sesión
         email = get_jwt_identity()
         lista = supabase.table("usuarios").select("*").match({'email': email}).execute()
         usuario_id = lista.data[0]['id']
@@ -108,13 +124,17 @@ def chat():
     except Exception as e:
         return jsonify({"response": res, "error": str(e)})
 
+# Ruta para cerrar sesión (requiere autenticación)
 @app.route('/api/cerrar_sesion', methods=['GET'])
 @jwt_required()
 def cerrar_sesion():
     try:
+        # Cerrar sesión utilizando el servicio de autenticación de Supabase
         response = supabase.auth.sign_out()
         return jsonify({"mensaje": "Usuario desconectado"})
     except Exception as e:
         return jsonify({"error": str(e)})
+
+# Iniciar la aplicación si este script es ejecutado directamente
 if __name__ == "__main__":
     app.run(debug=True)
