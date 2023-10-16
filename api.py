@@ -209,6 +209,57 @@ def chat():
         return jsonify({"response": res, "mensaje": "Historial de chat guardado con éxito"})
     except Exception as e:
         return jsonify({"response": res, "error": str(e)})
+    
+
+# Ruta para obtener la lista de contactos
+@app.route('/api/contactos', methods=['GET'])
+def obtener_contactos():
+    try:
+        response = supabase.table("contactos").select("*").execute()
+        return jsonify(response.data)
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+# Ruta para obtener un contacto por su ID
+@app.route('/api/contactos/<int:usuario_id>', methods=['GET'])
+def obtener_contacto_por_id(usuario_id):
+    try:
+        response = supabase.table("contactos").select("*").eq('usuario_id', usuario_id).execute()
+        if response.data:
+            # Si se encuentra el usuario, retornar sus datos
+            return jsonify(response.data)
+        else:
+            # Si no se encuentra el usuario, retornar un mensaje de error
+            return jsonify({"mensaje": "Contactos no encontrados"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+# Ruta para insertar un nuevo contacto
+@app.route('/api/contactos', methods=['POST'])
+@jwt_required()
+def insertar_contacto():
+    try:
+        data = request.get_json()
+
+        # Obtener los datos del formulario o solicitud
+        mensaje = data.get('mensaje')
+
+        # Obtener el ID del usuario utilizando el correo electrónico de la sesión
+        email = get_jwt_identity()
+        lista = supabase.table("usuarios").select("*").match({'email': email}).execute()
+        usuario_id = lista.data[0]['id']
+
+        # Insertar en la tabla contactos 
+        supabase.table("contactos").upsert([
+            {
+                "usuario_id": usuario_id,
+                "mensaje": mensaje
+            }
+        ]).execute()
+
+        return jsonify({"mensaje": "Contacto registrado con éxito"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 # Iniciar la aplicación si este script es ejecutado directamente
 if __name__ == "__main__":
