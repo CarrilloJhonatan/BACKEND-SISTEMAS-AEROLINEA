@@ -1,57 +1,75 @@
 # BACKEND-SISTEMAS-AEROLINEA
 A continuación, explicaré las funciones de cada ruta en la Api:
 
-Obtener Usuarios (/api/usuarios, método GET):
-
-Descripción: Esta ruta obtiene la lista de todos los usuarios almacenados en la base de datos.
-Uso:
+# Rutas relacionadas con Usuarios
+Obtener todos los usuarios
+Ruta: /api/usuarios
 Método HTTP: GET
-Endpoint: /api/usuarios
-Retorno:
-JSON con la lista de usuarios o un mensaje de error si ocurre algún problema.
-Registrar Usuario (/api/usuarios, método POST):
-
-Descripción: Registra un nuevo usuario en la base de datos y en el servicio de autenticación.
-Uso:
-Método HTTP: POST
-Endpoint: /api/usuarios
-Datos requeridos en el cuerpo de la solicitud (JSON): nombre, email, contraseña
-Retorno:
-JSON con un mensaje de éxito si el usuario se registra correctamente o un mensaje de error si ocurre algún problema.
-Consultar Historial de Chat (/api/historial_chat, método GET):
-
-Descripción: Consulta el historial de chat, requiriendo autenticación mediante un token JWT.
-Uso:
+Descripción: Retorna todos los usuarios registrados.
+Autenticación: No se requiere.
+Obtener un usuario por ID
+Ruta: /api/usuarios/<int:usuario_id>
 Método HTTP: GET
-Endpoint: /api/historial_chat
-Encabezado de autenticación: Authorization: Bearer <TOKEN_JWT>
-Retorno:
-JSON con el historial de chat o un mensaje de error si la autenticación falla o hay algún problema.
-Iniciar Sesión (/api/iniciar_sesion, método POST):
-
-Descripción: Autentica a un usuario con su correo electrónico y contraseña y proporciona un token de acceso JWT.
-Uso:
+Descripción: Retorna la información de un usuario específico.
+Parámetros de Ruta: usuario_id es el identificador único del usuario.
+Autenticación: No se requiere.
+Registrar un nuevo usuario
+Ruta: /api/usuarios
 Método HTTP: POST
-Endpoint: /api/iniciar_sesion
-Datos requeridos en el cuerpo de la solicitud (JSON): email, contraseña
-Retorno:
-JSON con un mensaje de éxito y un token de acceso si la autenticación es exitosa o un mensaje de error si ocurre algún problema.
-Procesar Chat (/api/chat, método POST):
-
-Descripción: Procesa solicitudes del chatbot, requiriendo autenticación mediante un token JWT, y guarda la conversación en el historial.
-Uso:
+Descripción: Registra un nuevo usuario en el sistema.
+Datos de la Solicitud: Nombre, email, y contraseña del nuevo usuario.
+Autenticación: No se requiere.
+Actualizar un usuario por ID
+Ruta: /api/usuarios/<int:usuario_id>
+Método HTTP: PUT
+Descripción: Actualiza la información de un usuario específico.
+Parámetros de Ruta: usuario_id es el identificador único del usuario.
+Datos de la Solicitud: Los campos a actualizar (nombre, email, contraseña).
+Autenticación: Se requiere un token JWT.
+Eliminar un usuario por ID
+Ruta: /api/usuarios/<int:usuario_id>
+Método HTTP: DELETE
+Descripción: Elimina un usuario específico del sistema.
+Parámetros de Ruta: usuario_id es el identificador único del usuario.
+Autenticación: Se requiere un token JWT.
+Iniciar Sesión
+Ruta: /api/iniciar_sesion
 Método HTTP: POST
-Endpoint: /api/chat
-Encabezado de autenticación: Authorization: Bearer <TOKEN_JWT>
-Datos requeridos en el cuerpo de la solicitud (JSON): message
-Retorno:
-JSON con la respuesta del chatbot y un mensaje de éxito si la operación es exitosa, o un mensaje de error si ocurre algún problema.
-Cerrar Sesión (/api/cerrar_sesion, método GET):
-
-Descripción: Cierra la sesión del usuario, requiriendo autenticación mediante un token JWT.
-Uso:
+Descripción: Autentica al usuario y proporciona un token JWT.
+Datos de la Solicitud: Email y contraseña del usuario.
+Autenticación: No se requiere.
+Cerrar Sesión
+Ruta: /api/cerrar_sesion
 Método HTTP: GET
-Endpoint: /api/cerrar_sesion
-Encabezado de autenticación: Authorization: Bearer <TOKEN_JWT>
-Retorno:
-JSON con un mensaje de éxito si la sesión se cierra correctamente o un mensaje de error si ocurre algún problema.
+Descripción: Cierra la sesión actual del usuario.
+Autenticación: Se requiere un token JWT.
+# Rutas relacionadas con Historial de Chat
+Obtener historial de chat
+Ruta: /api/historial_chat
+Método HTTP: GET
+Descripción: Retorna el historial completo de chat.
+Autenticación: Se requiere un token JWT.
+Obtener historial de chat por ID de Usuario
+Ruta: /api/historial_chat/<int:usuario_id>
+Método HTTP: GET
+Descripción: Retorna el historial de chat de un usuario específico.
+Parámetros de Ruta: usuario_id es el identificador único del usuario.
+Autenticación: Se requiere un token JWT.
+# Rutas relacionadas con Contactos
+Obtener todos los contactos
+Ruta: /api/contactos
+Método HTTP: GET
+Descripción: Retorna todos los contactos registrados.
+Autenticación: No se requiere.
+Obtener contacto por ID de Usuario
+Ruta: /api/contactos/<int:usuario_id>
+Método HTTP: GET
+Descripción: Retorna los contactos de un usuario específico.
+Parámetros de Ruta: usuario_id es el identificador único del usuario.
+Autenticación: No se requiere.
+Insertar nuevo contacto
+Ruta: /api/contactos
+Método HTTP: POST
+Descripción: Registra un nuevo contacto.
+Datos de la Solicitud: Mensaje del contacto.
+Autenticación: Se requiere un token JWT.
