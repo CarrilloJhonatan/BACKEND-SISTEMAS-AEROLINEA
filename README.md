@@ -3,7 +3,9 @@ A continuación, explicaré las funciones de cada ruta en la Api:
 
 # Rutas relacionadas con Usuarios
 Obtener todos los usuarios
+
 Ruta: /api/usuarios
+
 Método HTTP: GET
 Descripción: Retorna todos los usuarios registrados.
 Autenticación: No se requiere.
