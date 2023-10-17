@@ -63,6 +63,21 @@
 - Parámetros de Ruta: `usuario_id` es el identificador único del usuario.
 - Autenticación: Se requiere un token JWT.
 
+# Rutas relacionadas con Chat
+
+## Procesar solicitudes del chatbot (requiere autenticación)
+- Ruta: `/api/chat`
+- Método HTTP: POST
+- Descripción: Procesa las solicitudes del chatbot y guarda el historial de chat.
+- Autenticación: Se requiere un token JWT.
+
+### Datos de la Solicitud:
+- Datos JSON con el siguiente formato:
+  ```json
+  {
+    "message": "Texto del mensaje"
+  }
+
 # Rutas relacionadas con Contactos
 
 ## Obtener todos los contactos
