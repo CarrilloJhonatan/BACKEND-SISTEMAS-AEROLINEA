@@ -6,11 +6,12 @@ import sys
 import secrets
 from flask import Flask, request, jsonify, session
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_cors import CORS 
 from supabase import create_client
 from chatbot import get_response, predict_class
 # Crear una instancia de la aplicación Flask
 app = Flask(__name__)
-
+CORS(app) # Aplica CORS a la aplicación
 # Configurar la clave secreta de la aplicación y la clave secreta para JWT
 app.secret_key = secrets.token_urlsafe(32)
 app.config['JWT_SECRET_KEY'] = secrets.token_urlsafe(32)
