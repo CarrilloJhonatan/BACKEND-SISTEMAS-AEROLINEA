@@ -77,6 +77,33 @@ def registrar_usuario():
         return jsonify({"error": str(e)})
     
 
+# Ruta para registrar un nuevo usuario Adnin
+@app.route('/api/usuariosadmin', methods=['POST'])
+def registrar_usuarioadmin():
+    try:
+        data = request.get_json()
+        nombre = data.get('nombre')
+        email = data.get('email')
+        contraseña = data.get('contraseña')
+
+        # Registrarse en el servicio de autenticación de Supabase
+        response = supabase.auth.sign_up({"email": email, "password": contraseña})
+
+        # Crear un nuevo usuario y almacenarlo en la base de datos
+        nuevo_usuario = {
+            "nombre": nombre,
+            "email": email,
+            "contraseña": contraseña,
+            "es_administrador": True,
+        }
+        supabase.table("usuarios").upsert([nuevo_usuario]).execute()
+
+        return jsonify({"mensaje": "Usuario Admin registrado con éxito"})
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+    
+
 # Ruta para actualizar un usuario por su ID
 @app.route('/api/usuarios/<int:usuario_id>', methods=['PUT'])
 @jwt_required()
