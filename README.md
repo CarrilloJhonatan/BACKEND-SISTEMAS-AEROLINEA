@@ -1,3 +1,34 @@
+### REQUERIMIENTOS
+
+Para utilizar esta API, asegúrate de cumplir con los siguientes requerimientos:
+
+1. **Python 3.9:** Se recomienda utilizar Python 3.9, ya que la API ha sido desarrollada en esta versión.
+
+2. **Instalación de dependencias:** Ejecuta el siguiente comando para instalar todas las dependencias necesarias listadas en el archivo `requirements.txt`:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3. **Ejecución del entrenamiento:** Ejecuta el script `training.py`. Este paso es necesario ya que se instalan algunos archivos localmente en la máquina a través de la librería TensorFlow para las redes neuronales del chatbot.
+
+4. **Ejecución de la API:** Para iniciar la API, ejecuta el script `api.py`. Una vez ejecutado, puedes realizar peticiones a la API según sea necesario.
+
+## Nota Importante
+
+Para acceder a las rutas que requieren autenticación, sigue estos pasos:
+
+1. Inicia sesión con un usuario registrado para obtener un token de autenticación.
+
+2. Utiliza el token generado durante el inicio de sesión para acceder a las rutas que requieren autenticación.
+
+3. Incluye el token en el encabezado de la solicitud de la siguiente manera:
+
+    - **Key (Clave):** `Authorization`
+    - **Value (Valor):** `Bearer tokengeneradoaliniciarseccion`
+
+Este proceso garantiza que solo los usuarios autenticados y autorizados tengan acceso a las funciones protegidas de la aplicación, proporcionando un nivel adicional de seguridad y control en el manejo de datos y recursos.
+
 # Rutas relacionadas con Usuarios
 
 ## Obtener todos los usuarios
