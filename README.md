@@ -1,3 +1,19 @@
+### REQUERIMIENTOS
+
+Para utilizar esta API, asegúrate de cumplir con los siguientes requerimientos:
+
+1. **Python 3.9:** Se recomienda utilizar Python 3.9, ya que la API ha sido desarrollada en esta versión.
+
+2. **Instalación de dependencias:** Ejecuta el siguiente comando para instalar todas las dependencias necesarias listadas en el archivo `requirements.txt`:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+3. **Ejecución del entrenamiento:** Ejecuta el script `training.py`. Este paso es necesario ya que se instalan algunos archivos localmente en la máquina a través de la librería TensorFlow para las redes neuronales del chatbot.
+
+4. **Ejecución de la API:** Para iniciar la API, ejecuta el script `api.py`. Una vez ejecutado, puedes realizar peticiones a la API según sea necesario.
+
 # Rutas relacionadas con Usuarios
 
 ## Obtener todos los usuarios
