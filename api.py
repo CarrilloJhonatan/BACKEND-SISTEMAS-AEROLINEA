@@ -159,7 +159,7 @@ def iniciar_sesion():
         supabase.auth.sign_in_with_password({"email": email, "password": contraseña})
 
         # Obtener la información del usuario, incluyendo el nombre y el ID
-        usuario_info = supabase.table("usuarios").select("id", "nombre").match({'email': email}).execute()
+        usuario_info = supabase.table("usuarios").select("id", "nombre", "es_administrador").match({'email': email}).execute()
         usuario_data = usuario_info.data[0] if usuario_info.data else None
 
         # Crear un token JWT para el usuario autenticado y darle tiempo de expiración a 1 hora
@@ -172,7 +172,8 @@ def iniciar_sesion():
             "mensaje": "Usuario autenticado con éxito",
             "access_token": access_token,
             "id_usuario": usuario_data['id'] if usuario_data else None,
-            "nombre_usuario": usuario_data['nombre'] if usuario_data else None
+            "nombre_usuario": usuario_data['nombre'] if usuario_data else None,
+            "es_administrador": usuario_data['es_administrador'] if usuario_data else None
         })
     except Exception as e:
         return jsonify({"error": str(e)})
