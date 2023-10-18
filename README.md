@@ -51,6 +51,13 @@ Este proceso garantiza que solo los usuarios autenticados y autorizados tengan a
 - Datos de la Solicitud: Nombre, email, y contraseña del nuevo usuario.
 - Autenticación: No se requiere.
 
+## Registrar un nuevo usuario Administrador
+- Ruta: `/api/usuariosadmin`
+- Método HTTP: POST
+- Descripción: Registra un nuevo usuario Administrador en el sistema.
+- Datos de la Solicitud: Nombre, email, y contraseña del nuevo usuario.
+- Autenticación: No se requiere.
+
 ## Actualizar un usuario por ID
 - Ruta: `/api/usuarios/<int:usuario_id>`
 - Método HTTP: PUT
