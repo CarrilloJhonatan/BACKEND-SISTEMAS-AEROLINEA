@@ -158,16 +158,25 @@ def iniciar_sesion():
         # Autenticar al usuario utilizando el servicio de autenticación de Supabase
         supabase.auth.sign_in_with_password({"email": email, "password": contraseña})
 
-        # Crear un token JWT para el usuario autenticado y darle tiempo de expiracion a 1 hora
+        # Obtener la información del usuario, incluyendo el nombre y el ID
+        usuario_info = supabase.table("usuarios").select("id", "nombre").match({'email': email}).execute()
+        usuario_data = usuario_info.data[0] if usuario_info.data else None
+
+        # Crear un token JWT para el usuario autenticado y darle tiempo de expiración a 1 hora
         access_token = create_access_token(identity=email, expires_delta=datetime.timedelta(seconds=3600))
 
         # Almacenar el token en la variable de sesión (opcional)
         session['access_token'] = access_token
 
-        return jsonify({"mensaje": "Usuario autenticado con éxito", "access_token": access_token})
+        return jsonify({
+            "mensaje": "Usuario autenticado con éxito",
+            "access_token": access_token,
+            "id_usuario": usuario_data['id'] if usuario_data else None,
+            "nombre_usuario": usuario_data['nombre'] if usuario_data else None
+        })
     except Exception as e:
         return jsonify({"error": str(e)})
-
+    
 # Ruta para cerrar sesión (requiere autenticación)
 @app.route('/api/cerrar_sesion', methods=['GET'])
 @jwt_required()
